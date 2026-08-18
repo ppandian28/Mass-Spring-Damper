@@ -59,7 +59,7 @@ jobs:
       - name: Move reports to a single directory
         run: | 
           mkdir final-results
-          find combined-results/ -name "*.xml" -exec cp {} final-results/ ;
+          find combined-results/ -name "*.xml" -exec cp {} final-results/ \;
 
       - name: Load Allure History and Generate
         uses: simple-elf/allure-report-action@master
