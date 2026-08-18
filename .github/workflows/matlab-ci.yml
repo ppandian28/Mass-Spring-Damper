@@ -45,4 +45,36 @@ jobs:
           path: allure-results/${{ matrix.matlab-release }}-results.xml
           retention-days: 5
 
+  generate-allure-dashboard:
+    needs: run-matlab-matrix
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Download All Matrix Reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: junit-report-*
+          path: combined-results
+
+      - name: Move reports to a single directory
+        run: | 
+          mkdir final-results
+          find combined-results/ -name "*.xml" -exec cp {} final-results/ ;
+
+      - name: Load Allure History and Generate
+        uses: simple-elf/allure-report-action@master
+        with: 
+          allure_results: final-results
+          allure_history: allure-history
+          keep_reports: 20
+
+      - name: Deploy Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-history
+          
+
+
+
             
