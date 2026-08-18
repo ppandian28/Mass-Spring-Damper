@@ -1,13 +1,10 @@
 # This is a basic workflow to help you get started with MATLAB Actions
-name: MATLAB Build
+name: MATLAB Multi-Version Matrix
 
 # Controls when the action will run. 
 on: 
-  push:                       # Runs on push events
-  pull_request:               # Runs on pull requests
   workflow_dispatch:          # Allows you to run this workflow manually from the Actions tab
-  schedule:
-    - cron:  '7 6 * * 3' # schedule a weekly build to keep caches warm
+
 
 env:
   PRODUCT_LIST: MATLAB MATLAB_Test MATLAB_Compiler MATLAB_Compiler_SDK Parallel_Computing_Toolbox
@@ -15,114 +12,37 @@ env:
 
 jobs:
 
-  mex-and-unittests:
-    # This job will run for each OS present in the matrix
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]  
-     
+  run-matlab-matrix:     
     # The type of runner that the job will run on
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        matlab-release: [R2024a,R2024b,R2025a]
+      
  
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository code
+        uses: actions/checkout@v4
        
       - name: Setup MATLAB
-        uses: matlab-actions/setup-matlab@v2
+        uses: matlab-actions/setup-matlab@v3
         with:
-          release: latest-including-prerelease
+          release: ${{ matrix.matlab-release }}
           cache: true
           products: ${{ env.PRODUCT_LIST }}
  
-      - name: Run ${{ matrix.os }} build to create MEX files and run unit tests
-        uses: matlab-actions/run-build@v2
+      - name: Run MATLAB Unit Tests
+        uses: matlab-actions/run-tests@v3
         with:
-          tasks: test
-          build-options: -parallel
- 
-      - name: Uploads mex files, test results, and build traces
+          test-results-junit: allure-results/${{ matrix.matlab-release }}-results.xml
+         
+      - name: Upload Version Report Artifact
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: build-artifacts-${{ matrix.os }}
-          path: |
-            toolbox/**/*
-            results/
-            .buildtool/
+          name: junit-report-${{ matrix.matlab-release }}
+          path: allure-results/${{ matrix.matlab-release }}-results.xml
+          retention-days: 5
+
             
-  release-toolbox:
-    # This job executes only after a successful completion of 'mex-and-unittests' job
-    needs: mex-and-unittests
-
-    runs-on:  ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
- 
-      - name: Setup MATLAB
-        uses: matlab-actions/setup-matlab@v2
-        with:
-          release: latest-including-prerelease
-          cache: true
-          products: ${{ env.PRODUCT_LIST }}
-
-      - name: Setup display (required for building doc in MATLAB)
-        uses: pyvista/setup-headless-display-action@v2
-        with:
-          pyvista: false
-
-      - name: Download artifacts from all platforms
-        uses: actions/download-artifact@v4
-        with:   
-          pattern: build-artifacts-*
-          merge-multiple: true
-      
-      - name: Download artifacts from the running platform last to guarantee incremental build
-        uses: actions/download-artifact@v4
-        with:   
-          pattern: build-artifacts-ubuntu-latest
-          merge-multiple: true
-
-      - name: Build the toolbox, including all OS specific files 
-        uses: matlab-actions/run-build@v2
-        with:
-          tasks: release
-
-      - name: Upload Toolbox 
-        uses: actions/upload-artifact@v4
-        with:
-          name: Mass-Spring-Damper Toolbox (All Platforms)
-          path: release/Mass-Spring-Damper.mltbx
-
-  deploy-service:
-    # This job executes only after a successful completion of 'mex-and-unittests' job
-    needs: mex-and-unittests
-  
-  
-    runs-on: ubuntu-latest
-  
-    steps:
-      - uses: actions/checkout@v4
-  
-      - name: Setup MATLAB
-        uses: matlab-actions/setup-matlab@v2
-        with:
-          release: latest-including-prerelease
-          cache: true
-          products: ${{ env.PRODUCT_LIST }}
-  
-      - name: Download Linux artifacts(to benefit from incremental build)
-        uses: actions/download-artifact@v4
-        with:   
-          pattern: build-artifacts-ubuntu-latest
-          merge-multiple: true
-  
-      - name: Build the ctf archive and run equivalence integration tests
-        uses: matlab-actions/run-build@v2
-        with:
-          tasks: deploy
-  
-      - name: Upload Production Server Archive 
-        uses: actions/upload-artifact@v4
-        with:
-          name: Mass-Spring-Damper Production Server Archive 
-          path: results/glnxa64/ctf-archive
