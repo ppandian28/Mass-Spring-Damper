@@ -4,6 +4,9 @@ name: MATLAB Multi-Version Matrix
 # Controls when the action will run. 
 on: 
   workflow_dispatch:          # Allows you to run this workflow manually from the Actions tab
+  schedule:
+    # Runs automatically at midnight every single night
+    - cron: '0 0 * * *'
 
 permissions:
   contents: write
