@@ -1,8 +1,0 @@
-"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","104","testInvalidInput","","","passed","","","designTest","designTest",""
-"","33","testDampingTypes","","","passed","","","designTest","designTest",""
-"","17","testOvershoot","","","passed","","","designTest","designTest",""
-"","1665","MatchesConvBaseline","","","broken","","","convecTest","convecTest",""
-"","1338","exampleRunsWithoutWarningTest(example=gettingStarted)","","","passed","","","exampleTest","exampleTest",""
-"","2295","exampleRunsWithoutWarningTest(example=BuildPlanDetails)","","","passed","","","exampleTest","exampleTest",""
-"","330","testSettlingTime","","","passed","","","designTest","designTest",""
