@@ -41,6 +41,13 @@ jobs:
         uses: matlab-actions/run-tests@v3
         with:
           test-results-junit: allure-results/${{ matrix.matlab-release }}-results.xml
+
+      - name: Create Allure Environment metadata
+        if: always()
+        run: |
+            echo  "MATLAB_Version=${{ matrix.matlab-release }}" >> allure-results/environment.properties
+            echo "Runner_OS=Ubuntu-Latest" >> allure-results/environment.properties
+            echo "Trigger_Type=Manual_Dispatch" >> allure-results/environment.properties
          
       - name: Upload Version Report Artifact
         uses: actions/upload-artifact@v4
