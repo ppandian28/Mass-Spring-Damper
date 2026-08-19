@@ -54,7 +54,7 @@ jobs:
         if: always()
         with:
           name: junit-report-${{ matrix.matlab-release }}
-          path: allure-results/${{ matrix.matlab-release }}-results.xml
+          path: allure-results/
           retention-days: 5
 
   generate-allure-dashboard:
@@ -72,6 +72,11 @@ jobs:
         run: | 
           mkdir final-results
           find combined-results/ -name "*.xml" -exec cp {} final-results/ \;
+
+      - name: Generate Centralized Allure Environment File
+        run: |
+          echo "Tested_MATLAB_Releases=R2024a, R2024b, R2025a" >> final-results/environment.propertiesecho "Runner_OS=Ubuntu-Latest" >> final-results/environment.propertiesecho "CI_Platform=GitHub_Actions" >> final-results/environment.properties
+          
 
       - name: Load Allure History and Generate
         uses: simple-elf/allure-report-action@master
