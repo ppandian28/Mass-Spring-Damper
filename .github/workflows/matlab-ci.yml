@@ -65,6 +65,10 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+
+      - name: check out code
+        uses: actions/checkout@4
+       
       - name: Download All Matrix Reports
         uses: actions/download-artifact@v4
         with:
@@ -73,8 +77,9 @@ jobs:
 
       - name: Move reports to a single directory
         run: | 
-          mkdir final-results
-          find combined-results/ -name "*.xml" -exec cp {} final-results/ \;
+          mkdir -p final-results/R2024a final-results/R2024b final-results/R2025a[ -f combined-results/junit-report-R2024a/R2024a-results.xml ] && cp combined-results/junit-report-R2024a/R2024a-results.xml final-results/R2024a/
+          [ -f combined-results/junit-report-R2024b/R2024b-results.xml ] && cp combined-results/junit-report-R2024b/R2024b-results.xml final-results/R2024b/
+          [ -f combined-results/junit-report-R2025a/R2025a-results.xml ] && cp combined-results/junit-report-R2025a/R2025a-results.xml final-results/R2025a/
 
       - name: Generate Centralized Allure Environment File
         run: |
