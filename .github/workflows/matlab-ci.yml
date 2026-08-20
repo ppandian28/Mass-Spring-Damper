@@ -80,9 +80,9 @@ jobs:
          mkdir -p final-results/R2024a
          mkdir -p final-results/R2024b
          mkdir -p final-results/R2025a
-         find combined-results/junit-report-R2024a/ -name ".xml" -exec cp {} final-results/R2024a/ ; || true
-         find combined-results/junit-report-R2024b/ -name ".xml" -exec cp {} final-results/R2024b/ ; || true
-         find combined-results/junit-report-R2025a/ -name "*.xml" -exec cp {} final-results/R2025a/ ; || true
+         cp combined-results/junit-report-R2024a//*.xml final-results/R2024a/ || true
+         cp combined-results/junit-report-R2024b//.xml final-results/R2024b/ || true
+         cp combined-results/junit-report-R2025a/**/.xml final-results/R2025a/ || true
     
       - name: Generate Centralized Allure Environment File
         run: |
