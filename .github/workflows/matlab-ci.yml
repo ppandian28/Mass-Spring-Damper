@@ -77,10 +77,13 @@ jobs:
 
       - name: Move reports to a single directory
         run: | 
-          mkdir -p final-results/R2024a final-results/R2024b final-results/R2025a[ -f combined-results/junit-report-R2024a/R2024a-results.xml ] && cp combined-results/junit-report-R2024a/R2024a-results.xml final-results/R2024a/
-          [ -f combined-results/junit-report-R2024b/R2024b-results.xml ] && cp combined-results/junit-report-R2024b/R2024b-results.xml final-results/R2024b/
-          [ -f combined-results/junit-report-R2025a/R2025a-results.xml ] && cp combined-results/junit-report-R2025a/R2025a-results.xml final-results/R2025a/
-
+         mkdir -p final-results/R2024a
+         mkdir -p final-results/R2024b
+         mkdir -p final-results/R2025a
+         find combined-results/junit-report-R2024a/ -name ".xml" -exec cp {} final-results/R2024a/ ; || true
+         find combined-results/junit-report-R2024b/ -name ".xml" -exec cp {} final-results/R2024b/ ; || true
+         find combined-results/junit-report-R2025a/ -name "*.xml" -exec cp {} final-results/R2025a/ ; || true
+    
       - name: Generate Centralized Allure Environment File
         run: |
           echo "Tested_MATLAB_Releases=R2024a, R2024b, R2025a" >> final-results/environment.propertiesecho "Runner_OS=Ubuntu-Latest" >> final-results/environment.propertiesecho "CI_Platform=GitHub_Actions" >> final-results/environment.properties
