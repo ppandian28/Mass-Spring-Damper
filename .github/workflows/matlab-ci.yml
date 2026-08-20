@@ -89,23 +89,27 @@ jobs:
         run: |
           mkdir final-results
           python -c '
-          import os, glob
-          from lxml import etree
-          versions = ["R2024a", "R2024b", "R2025a"]
-          for v in versions:
-          search_path = f"combined-results/junit-report-{v}/**/*.xml"
-          for xml_file in glob.glob(search_path, recursive=True):
-          tree = etree.parse(xml_file)
-          root = tree.getroot()
-          suites = root.findall(".//testsuite")
-          if root.tag == "testsuites"
-            suites = [root]
-          for suite in suites:
-            current_name = suite.get("name", "MATLAB_Tests")
-            suite.set("name", f"[{v}] {current_name}")
-          output_path = f"final-results/{v}-transformed.xml"
-          tree.write(output_path, encoding="utf-8", xml_declaration=True)
-          print(f"Transformed: {xml_file} -> {output_path}")
+           import os, glob
+           from lxml import etree
+          
+           versions = ["R2024a", "R2024b", "R2025a"]
+           for v in versions:
+           search_path = f"combined-results/junit-report-{v}/**/*.xml"
+           for xml_file in glob.glob(search_path, recursive=True):
+           tree = etree.parse(xml_file)
+           root = tree.getroot()
+          
+           suites = root.findall(".//testsuite")
+           if root.tag == "testsuites":
+            suites.append(root)
+           elif root.tag == "testsuites" and not suites:
+          
+           for suite in suites:
+             current_name = suite.get("name", "MATLAB_Tests")
+             suite.set("name", f"[{v}] {current_name}")
+           output_path = f"final-results/{v}-transformed.xml"
+           tree.write(output_path, encoding="utf-8", xml_declaration=True)
+           print(f"Transformed: {xml_file} -> {output_path}")
     
       - name: Generate Centralized Allure Environment File
         run: |
