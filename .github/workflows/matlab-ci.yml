@@ -85,9 +85,9 @@ jobs:
           pattern: junit-report-*
           path: combined-results
 
-      - name: Inject Release metadata into XML Files
-        run: |
-            mkdir final-results
+      - name: Inject Release metadata into XML Files                                                                                                                                                     
+        run: |                                                                                                                                                                                           
+            mkdir final-results                                                                                                                                                                            
             python3 -c "                                                                                                                                                                                   
             import os, glob                                                                                                                                                                                
             from lxml import etree                                                                                                                                                                         
@@ -95,7 +95,7 @@ jobs:
             versions = ['R2024a', 'R2024b', 'R2025a']                                                                                                                                                      
             for v in versions:                                                                                                                                                                             
                 search_path = f'combined-results/junit-report-{v}/**/*.xml'                                                                                                                                
-                for xml_file in glob.glob(search_path, recursive=True):                                                                                                                                    
+                for xml_file in glob.glob(search_path, recursive=True):    
                     try:                                                                                                                                                                                   
                         tree = etree.parse(xml_file)                                                                                                                                                       
                         root = tree.getroot()                                                                                                                                                              
@@ -112,13 +112,13 @@ jobs:
                         print(f'Transformed: {xml_file} -> {output_path}')                                                                                                                                 
                     except Exception as e:                                                                                                                                                                 
                         print(f'Error processing {xml_file}: {e}')                                                                                                                                         
-            "                                  {xml_file}: {e}")                                                                                                                                         
-            EOF                        
+            "                    
     
       - name: Generate Centralized Allure Environment File
         run: |
-          echo "Tested_MATLAB_Releases=R2024a, R2024b, R2025a" >> final-results/environment.propertiesecho "Runner_OS=Ubuntu-Latest" >> final-results/environment.propertiesecho "CI_Platform=GitHub_Actions" >> final-results/environment.properties
-          
+            echo "Tested_MATLAB_Releases=R2024a, R2024b, R2025a" >> final-results/environment.properties                                                                                                   
+            echo "Runner_OS=Ubuntu-Latest" >> final-results/environment.properties                                                                                                                         
+            echo "CI_Platform=GitHub_Actions" >> final-results/environment.properties            
 
       - name: Load Allure History and Generate
         uses: simple-elf/allure-report-action@master
